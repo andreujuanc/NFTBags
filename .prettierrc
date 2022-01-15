@@ -1,0 +1,9 @@
+{
+  "overrides": [
+    {
+      "options": {
+        "printWidth": 160
+      }
+    }
+  ]
+}

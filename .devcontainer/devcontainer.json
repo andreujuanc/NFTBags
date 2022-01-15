@@ -1,0 +1,12 @@
+{
+	"name": "NFTBags",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { }
+	},
+	"settings": {},
+	"extensions": [
+		"juanblanco.solidity"
+	],
+	"remoteUser": "node"
+}
