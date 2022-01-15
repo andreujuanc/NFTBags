@@ -3,10 +3,39 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Connector, defaultChains, defaultL2Chains, InjectedConnector, Provider } from 'wagmi'
+import { providers } from 'ethers';
+
+const connector = new InjectedConnector({
+  chains: [{
+    id: 31337,
+    name: 'hardhat',
+    testnet: false,
+    rpcUrls: ['http://localhost:8545']
+  }]//[...defaultChains, ...defaultL2Chains],
+})
+
+type GetProviderArgs = {
+  chainId?: number;
+  connector?: Connector;
+}
+
+const provider = ({ chainId, connector }: GetProviderArgs) => {
+  console.log('getting provider', chainId)
+  if (chainId == 31337) {
+    const chain = connector?.chains.find(x=>x.id == 31337)?.rpcUrls[0]
+    return new providers.JsonRpcProvider(chain)
+  }
+  return providers.getDefaultProvider(chainId)
+}
+
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider connectors={[connector]} provider={provider} autoConnect>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

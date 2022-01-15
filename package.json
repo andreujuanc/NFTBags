@@ -3,7 +3,9 @@
   "scripts": {
     "test": "hardhat test",
     "clean": "hardhat clean",
-    "build": "npm run clean && hardhat compile"
+    "build": "npm run clean && hardhat compile",
+    "local:node":"hardhat node",
+    "local:deploy": "hardhat run ./scripts/deploy.ts --network localhost"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
