@@ -21,8 +21,17 @@ export function DashboardPage() {
     // })
 
     const handle_onAssetFound = (asset: Asset) => {
-        if (assets.find(x => x.address.toLowerCase() === asset.address.toLowerCase()))
-            return
+        if (asset.type == AssetType.ERC20) {
+            if (assets.find(x => x.address.toLowerCase() === asset.address.toLowerCase()))
+                return
+        }
+        debugger
+        if (asset.type == AssetType.ERC721) {
+            const found = assets.filter(x => x.address.toLowerCase() === asset.address.toLowerCase())
+            if (found.find(x => x.tokenId == asset.tokenId))
+                return
+        }
+        // TODO: validate 1155
         setAssets([...assets, asset])
     }
     const handle_selectionChanged = () => {
@@ -48,7 +57,7 @@ export function DashboardPage() {
             console.error(e)
         }
     }
-
+    console.log('assets', assets)
     const selectedAssets = assets.filter(x => x.selected)
     return (
         <section>

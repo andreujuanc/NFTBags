@@ -23,8 +23,9 @@ export function AssetItem({ asset, selected }: { asset: Asset, selected: (select
                 selected(checked)
             }} />
 
-            <span>{AssetType[asset.type]}</span>
-            <span>{asset.name}</span>
+            <div>{AssetType[asset.type]}</div>
+            <div>{asset.name}</div>
+            <div>{asset.tokenId}</div>
         </div>
     )
 }

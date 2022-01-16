@@ -1,9 +1,18 @@
 .asset-item{
- display: flex;
- flex-direction: row;
- align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    font-size: 12pt;
+    
 }
 
-.asset-item > *{
-    margin-right: 1rem;
+.asset-item > div{
+    margin-left: 0.5rem;
+}
+
+.asset-item > input{
+    width: 2rem;
+    height: 1.2rem;
 }

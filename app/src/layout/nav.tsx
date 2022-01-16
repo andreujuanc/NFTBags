@@ -1,5 +1,6 @@
 export function Nav() {
     return <nav>
-        Nav
+        <a href="#mint">Mint</a>
+        <a href="#burn">Burn</a>
     </nav>;
 }

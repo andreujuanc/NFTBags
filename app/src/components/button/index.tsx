@@ -7,6 +7,8 @@ type ButtonProps = {
     disabled?: boolean
     className?: string
     lineHeight?: number
+    color?: string
+    backgroundColor?: string
 }
 
 export function Button(props: ButtonProps) {
@@ -30,8 +32,12 @@ export function Button(props: ButtonProps) {
     return (
         <button
             disabled={props.disabled}
-            style={{ lineHeight: props.lineHeight ?? '1.5' }}
             className={"button white-shadow-1 " + (props.className ?? '') + (clicking ? ' clicking' : "")} onClick={onClick}
+            style={{
+                lineHeight: props.lineHeight ?? '1.5',
+                color: props.color,
+                backgroundColor: props.backgroundColor
+            }}
         >
             {props.children}
 

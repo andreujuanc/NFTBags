@@ -4,11 +4,17 @@ header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     font-size: calc(10px + 2vmin);
     color: white;
+    padding: 0.2rem 1rem;
   }
 
-  main{
-    background-color: #232b42;
-  }
+main{
+  background-color: #232b42;
+}
+
+nav > a{
+  color: #DDD;
+  margin-right: 1rem;
+}

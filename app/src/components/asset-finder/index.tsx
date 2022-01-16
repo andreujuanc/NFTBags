@@ -33,33 +33,50 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
             setAsset(undefined)
         }
     }
-    const handle_addClicked = () => {
+
+    const handle_721TokenIdChanged = (tokenId: string) => {
         if (asset)
-            onAssetFound(asset)
+            asset.tokenId = tokenId
     }
 
-    const handle_721TokenId = () => {
-
+    const handle_addClicked = () => {
+        if (asset) {
+            onAssetFound({ ...asset })
+            setAsset(undefined)
+        }
     }
 
     return (
         <div>
             <Container color="#E0E0E0">
                 <Input label="Contract Address" onChange={handle_onChange} />
-            </Container>
-            <div>
-                <div>
-                    <span>{asset && AssetType[asset.type]}</span>
-                    <span>{asset && asset.name}</span>
+                <div style={{ color: '#444', fontSize: '1rem' }}>
+                    {asset && AssetType[asset.type]} {asset && asset.name}
                 </div>
                 <div>
                     {asset && asset.type == AssetType.ERC721 &&
-                        <Input label="Token Id" onChange={() => { }} />
+                        <Input label="Token Id" onChange={handle_721TokenIdChanged} />
                     }
                 </div>
-                <Button onClick={handle_addClicked} disabled={!asset}>
-                    Add
-                </Button>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    flexDirection: 'row',
+                    marginTop: '1rem'
+                }}>
+                    <Button
+                        onClick={handle_addClicked}
+                        disabled={!asset}
+                        backgroundColor="#2a4272"
+                        color="#CCC"
+                    >
+                        Add
+                    </Button>
+                </div>
+            </Container>
+            <div>
+
+
             </div>
         </div>
     )
