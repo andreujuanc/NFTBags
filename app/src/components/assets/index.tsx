@@ -1,5 +1,6 @@
 import { Checkbox } from "../checkbox"
 import './index.css'
+//import Moralis from 'moralis'
 
 export function AssetList({ assets, selectionChanged }: {
     assets: Asset[],
@@ -34,12 +35,12 @@ export function AssetItem({ asset, selected }: { asset: Asset, selected: (select
 }
 
 export type Asset = {
-    id:string
+    id: string
     name: string
     symbol: string
     address: string
     type: AssetType
-    tokenId?: string 
+    tokenId?: string
     selected?: boolean
     balance?: string
 }
@@ -49,3 +50,10 @@ export enum AssetType {
     ERC721,
     ERC1155
 }
+
+// async function findUserAssetsWithMoralis(owner: string) {
+//     const polygonNFTs = await Moralis.Web3API.account.getNFTs({
+//         chain: 'mumbai',
+//         address: owner
+//     });
+// }

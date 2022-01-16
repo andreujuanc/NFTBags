@@ -1,30 +1,30 @@
 import { BaseProvider, getDefaultProvider, JsonRpcProvider } from "@ethersproject/providers";
 import { Contract } from "ethers";
 import { useState } from "react";
-import { erc20ABI, erc721ABI, erc1155ABI, useConnect, } from "wagmi";
+import { erc20ABI, erc721ABI, erc1155ABI, useConnect, useProvider, useAccount, } from "wagmi";
 import { erc165Abi } from "../../abis/ERC154";
 import { Asset, AssetType } from "../assets";
 import { Button } from "../button";
 import { Container } from "../container";
 import { Input } from "../input";
+//import Moralis from 'moralis'
 
 const ERC1155InterfaceId: string = "0xd9b67a26"
 const ERC721InterfaceId: string = "0x80ac58cd"
 
 export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => void }) {
     const [asset, setAsset] = useState<Asset | undefined>(undefined)
-    //const provider = useProvider()
+    const provider = useProvider()
+    const [{ data: accountData }] = useAccount()
     const [{ data, error, loading, }, connect] = useConnect()
 
     const handle_onChange = async (value: string) => {
-        const provider = new JsonRpcProvider('http://localhost:8545', {
-            name: 'hardhat',
-            chainId: await data.connector?.getChainId() ?? 0
-        })
+        if (!accountData) return
         if (!value) {
             setAsset(undefined)
             return
         }
+        //const foundInMoralis = await findWithMoralis(accountData.address, value)
         const found = await tryGetContract(value, provider)
         if (found) {
             setAsset(found)
@@ -139,3 +139,12 @@ async function tryGetContract(address: string, provider: BaseProvider): Promise<
     catch { }
 
 }
+
+// async function findWithMoralis(owner: string, contract: string) {
+//     const polygonNFTs = await Moralis.Web3API.account.getNFTsForContract({
+//         token_address: contract,
+//         chain: 'mumbai',
+//         address: owner
+//     });
+// }
+

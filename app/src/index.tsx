@@ -10,8 +10,13 @@ const connector = new InjectedConnector({
   chains: [{
     id: 31337,
     name: 'hardhat',
-    testnet: false,
+    testnet: true,
     rpcUrls: ['http://localhost:8545']
+  }, {
+    id: 80001,
+    name: 'Polygon Mumbai',
+    testnet: true,
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com']
   }]//[...defaultChains, ...defaultL2Chains],
 })
 
@@ -23,7 +28,11 @@ type GetProviderArgs = {
 const provider = ({ chainId, connector }: GetProviderArgs) => {
   console.log('getting provider', chainId)
   if (chainId == 31337) {
-    const chain = connector?.chains.find(x=>x.id == 31337)?.rpcUrls[0]
+    const chain = connector?.chains.find(x => x.id == 31337)?.rpcUrls[0]
+    return new providers.JsonRpcProvider(chain)
+  }
+  else if (chainId == 80001) {
+    const chain = connector?.chains.find(x => x.id == 80001)?.rpcUrls[0]
     return new providers.JsonRpcProvider(chain)
   }
   return providers.getDefaultProvider(chainId)

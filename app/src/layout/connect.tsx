@@ -10,11 +10,17 @@ export const Connect = () => {
         const chainId = connectData.connector?.getProvider(false).chainId
         return (
             <Button onClick={() => { }} >
-                <span>
+                <div>
                     {accountData?.address.substring(0, 5)}
                     ...
                     {accountData?.address.substring(accountData?.address.length - 4)}
-                </span>
+                </div>
+                <div  style={{
+                    fontSize: '8pt'
+                }}>
+                    {chainId === '0x13881' && 'Polygon Mumbai'} 
+                    {chainId === '0x7a69' && 'Localhost'}
+                </div>
             </Button>
         )
     }
