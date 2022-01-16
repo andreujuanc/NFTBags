@@ -48,6 +48,7 @@ export function DashboardPage() {
     }
 
     const handle_approve = async () => {
+        setError(undefined)
         //TODO: check with isApprovedForAll
         try {
         
@@ -74,8 +75,11 @@ export function DashboardPage() {
     }
 
     const handle_mint = async () => {
+        setError(undefined)
         const tokens721 = assets.filter(x => x.type == AssetType.ERC721)
         const addresses721 = tokens721.map(x => x.address)
+        const ids721 =  tokens721.map(x => x.tokenId)
+
         const signer = await getSigner()
         const chainId = await signer?.getChainId()
         if (!chainId) return
@@ -85,7 +89,7 @@ export function DashboardPage() {
         try {
             console.log('minting', addresses721)
             const tx = await nftBags.mint(
-                addresses721, [0], //712
+                addresses721, ids721, //712
                 [], [], [] // 1155
             , )
             console.log('tx', tx)
@@ -95,6 +99,8 @@ export function DashboardPage() {
     }
 
     const selectedAssets = assets.filter(x => x.selected)
+    console.log('SELECTED', selectedAssets)
+    console.log('approved', approvedAssets)
     return (
         <section>
             <h1>
