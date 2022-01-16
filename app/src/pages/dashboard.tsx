@@ -44,8 +44,11 @@ export function DashboardPage() {
     }
 
     const handle_selectionChanged = (asset: Asset) => {
-
-        if (assets.findIndex(x => x.id == asset.id) >= 0) {
+        const index = assets.findIndex(x => x.id == asset.id) 
+        if (index>= 0) {
+            if(!asset.selected){
+                assets.splice(index)
+            }
             setAssets([...assets])
         }
         else {
