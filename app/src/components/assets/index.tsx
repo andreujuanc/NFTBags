@@ -21,7 +21,7 @@ export function AssetList({ assets, selectionChanged }: {
     }, [accountData?.address])
 
     return (<div>
-        {assets.concat(moralisAssets).map(x => (
+        {assets.concat(moralisAssets).sort((a,b)=>a.id < b.id ? -1 : 1 ).map(x => (
             <AssetItem key={`${x.address}-${x.tokenId}`} asset={x} selected={() => {
                 selectionChanged()
             }} />
