@@ -104,7 +104,7 @@ export function DashboardPage() {
     return (
         <section>
             <h1>
-                Mint
+                Pack bag
             </h1>
             <Container color="#2a4272">
                 <AssetFinder onAssetFound={handle_onAssetFound} />
@@ -119,7 +119,7 @@ export function DashboardPage() {
             </Container>}
             <div>
                 {nextToApprove && <Button onClick={handle_approve}>Approve {nextToApprove.name} {nextToApprove.tokenId}</Button>}
-                {approvedAssets.length == selectedAssets.length && <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Mint with {selectedAssets.length} assets</Button>}
+                {approvedAssets.length == selectedAssets.length && <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Pack bag with {selectedAssets.length} assets</Button>}
             </div>
         </section>
     )
