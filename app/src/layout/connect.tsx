@@ -1,23 +1,27 @@
 import { useEffect } from "react"
-import { erc20ABI, useConnect, useContract, useProvider } from "wagmi"
+import { erc20ABI, useAccount, useConnect, useContract, useProvider } from "wagmi"
 import { Button } from "../components/button"
 
 export const Connect = () => {
-    const [{ data, error, loading, }, connect] = useConnect()
-    
+    const [{ data: connectData, error, loading, }, connect] = useConnect()
+    const [{ data: accountData }] = useAccount()
 
-    if (data.connected) {
-        const chainId = data.connector?.getProvider(false).chainId
+    if (connectData.connected) {
+        const chainId = connectData.connector?.getProvider(false).chainId
         return (
             <Button onClick={() => { }} >
-                Disconnect from {chainId}
+                <span>
+                    {accountData?.address.substring(0, 5)}
+                    ...
+                    {accountData?.address.substring(accountData?.address.length - 4)}
+                </span>
             </Button>
         )
     }
 
     return (
         <Button key={'connect-metamask'} onClick={async () => {
-            console.log('lala', (await connect(data.connectors[0]))?.data?.chain)
+            console.log('lala', (await connect(connectData.connectors[0]))?.data?.chain)
         }}>
             Connect
         </Button>
