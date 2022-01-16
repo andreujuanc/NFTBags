@@ -17,6 +17,11 @@ export function DashboardPage() {
         skip: true
     })
 
+    const nextToApprove = assets.find(asset => {
+        if (approvedAssets.find(approved => approved == asset.id)) return false
+        return true
+    })
+
 
     // const nftBags = useContract({
     //     addressOrName: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
@@ -45,9 +50,7 @@ export function DashboardPage() {
     const handle_approve = async () => {
         //TODO: check with isApprovedForAll
         try {
-            const nextToApprove = assets.find(x => {
-                return true
-            })
+        
 
             if (nextToApprove) {
                 const signer = await getSigner()
@@ -60,8 +63,8 @@ export function DashboardPage() {
 
                     const contract721 = new Contract(nextToApprove.address, ERC721ABI, signer)
                     await contract721.functions.setApprovalForAll(nftBagsContractAddress, true)
-                    
-                    setApprovedAssets([...approvedAssets, `${nextToApprove.address}-${nextToApprove.tokenId}`])
+
+                    setApprovedAssets([...approvedAssets, nextToApprove.id])
                 }
             }
 
@@ -109,8 +112,8 @@ export function DashboardPage() {
                 </span>
             </Container>}
             <div>
-                <Button onClick={handle_approve}>Approve next</Button>
-                <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0 || approvedAssets.length != selectedAssets.length}>Mint with {selectedAssets.length} assets</Button>
+                {nextToApprove && <Button onClick={handle_approve}>Approve {nextToApprove.name} {nextToApprove.tokenId}</Button>}
+                {approvedAssets.length == selectedAssets.length && <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Mint with {selectedAssets.length} assets</Button>}
             </div>
         </section>
     )

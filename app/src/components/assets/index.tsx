@@ -26,11 +26,15 @@ export function AssetItem({ asset, selected }: { asset: Asset, selected: (select
             <div>{AssetType[asset.type]}</div>
             <div>{asset.name}</div>
             <div>{asset.tokenId}</div>
+            <div>
+                {asset.id}
+            </div>
         </div>
     )
 }
 
 export type Asset = {
+    id:string
     name: string
     symbol: string
     address: string

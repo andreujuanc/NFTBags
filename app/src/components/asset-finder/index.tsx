@@ -35,8 +35,10 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
     }
 
     const handle_721TokenIdChanged = (tokenId: string) => {
-        if (asset)
+        if (asset) {
+            asset.id += tokenId
             asset.tokenId = tokenId
+        }
     }
 
     const handle_addClicked = () => {
@@ -97,11 +99,12 @@ async function tryGetContract(address: string, provider: BaseProvider): Promise<
         if (!await supportsInterface(address, provider, ERC721InterfaceId)) throw new Error()
         const erc721 = new Contract(address, erc721ABI.concat(erc20ABI as any), provider)
         return {
+            id: `${address}-`,
             address: address,
             name: await erc721.functions.name(),
             symbol: '',
             type: AssetType.ERC721,
-            selected: true
+            selected: false
         }
     }
     catch (e) {
@@ -113,22 +116,24 @@ async function tryGetContract(address: string, provider: BaseProvider): Promise<
         const erc1155 = new Contract(address, erc1155ABI, provider)
         const metadataFile = erc1155.functions.uri()
         return {
+            id: `${address}-`,
             address: address,
             name: 'TODO: 1155 name',
             symbol: '',
             type: AssetType.ERC1155,
-            selected: true
+            selected: false
         }
     }
     catch { }
     try {
         const erc20 = new Contract(address, erc20ABI, provider)
         return {
+            id: `${address}-`,
             address: address,
             name: await erc20.functions.name(),
             symbol: '',
             type: AssetType.ERC20,
-            selected: true
+            selected: false
         }
     }
     catch { }
