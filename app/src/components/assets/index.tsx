@@ -8,7 +8,7 @@ export function AssetList({ assets, selectionChanged }: {
 
     return (<div>
         {assets.map(x => (
-            <AssetItem key={x.address} asset={x} selected={() => {
+            <AssetItem key={`${x.address}-${x.tokenId}`} asset={x} selected={() => {
                 selectionChanged()
             }} />
         ))}

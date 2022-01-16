@@ -10,7 +10,8 @@ import { Container } from "../components/container";
 
 export function DashboardPage() {
     const [assets, setAssets] = useState<(Asset)[]>([])
-    const [{ data: signer, error, loading }, getSigner] = useSigner({
+    const [error, setError] = useState<string>()
+    const [{ }, getSigner] = useSigner({
         skip: true
     })
 
@@ -25,7 +26,6 @@ export function DashboardPage() {
             if (assets.find(x => x.address.toLowerCase() === asset.address.toLowerCase()))
                 return
         }
-        debugger
         if (asset.type == AssetType.ERC721) {
             const found = assets.filter(x => x.address.toLowerCase() === asset.address.toLowerCase())
             if (found.find(x => x.tokenId == asset.tokenId))
@@ -41,9 +41,9 @@ export function DashboardPage() {
     const handle_mint = async () => {
         const tokens721 = assets.filter(x => x.type == AssetType.ERC721)
         const addresses721 = tokens721.map(x => x.address)
+        const signer = await getSigner()
         const chainId = await signer?.getChainId()
         if (!chainId) return
-        //const signer = await getSigner()
         const nftBags = new Contract(getContractAddresses(chainId).nftBags, nftBagsABI, signer)
 
         try {
@@ -53,11 +53,23 @@ export function DashboardPage() {
                 [], [], [] // 1155
             , )
             console.log('tx', tx)
-        } catch (e) {
-            console.error(e)
+        } catch (e: any) {
+            const errorPrefix = 'reverted with reason string'
+            const message = (e?.data?.message || e?.message) as (string | undefined)
+            if (message) {
+                const reverMessageIndex = message?.indexOf(errorPrefix)
+                if (reverMessageIndex && reverMessageIndex >= 0) {
+                    setError(message.substring(reverMessageIndex + errorPrefix.length))
+                }
+                else
+                    setError(message)
+            }
+            else {
+                setError(JSON.stringify(e))
+            }
         }
     }
-    console.log('assets', assets)
+
     const selectedAssets = assets.filter(x => x.selected)
     return (
         <section>
@@ -68,6 +80,13 @@ export function DashboardPage() {
                 <AssetFinder onAssetFound={handle_onAssetFound} />
                 <AssetList assets={assets} selectionChanged={handle_selectionChanged} />
             </Container>
+            {error && <Container color="#D22">
+                <span style={{
+                    fontSize: '14pt'
+                }}>
+                    {error}
+                </span>
+            </Container>}
             <div>
                 <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Mint with {selectedAssets.length} assets</Button>
             </div>
