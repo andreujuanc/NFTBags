@@ -5,6 +5,7 @@ import { erc20ABI, erc721ABI, erc1155ABI, useConnect, } from "wagmi";
 import { erc165Abi } from "../../abis/ERC154";
 import { Asset, AssetType } from "../assets";
 import { Button } from "../button";
+import { Container } from "../container";
 import { Input } from "../input";
 
 const ERC1155InterfaceId: string = "0xd9b67a26"
@@ -37,14 +38,24 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
             onAssetFound(asset)
     }
 
+    const handle_721TokenId = () => {
+
+    }
+
     return (
         <div>
-            <Input onChange={handle_onChange} />
-
+            <Container color="#E0E0E0">
+                <Input label="Contract Address" onChange={handle_onChange} />
+            </Container>
             <div>
                 <div>
                     <span>{asset && AssetType[asset.type]}</span>
                     <span>{asset && asset.name}</span>
+                </div>
+                <div>
+                    {asset && asset.type == AssetType.ERC721 &&
+                        <Input label="Token Id" onChange={() => { }} />
+                    }
                 </div>
                 <Button onClick={handle_addClicked} disabled={!asset}>
                     Add

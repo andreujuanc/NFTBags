@@ -5,6 +5,8 @@ import { Asset, AssetList, AssetType } from "../components/assets";
 import { Button } from "../components/button";
 import { nftBagsABI } from '../abis/NFTBags'
 import { Contract } from "ethers";
+import { getContractAddresses } from "../contracts";
+import { Container } from "../components/container";
 
 export function DashboardPage() {
     const [assets, setAssets] = useState<(Asset)[]>([])
@@ -30,8 +32,10 @@ export function DashboardPage() {
     const handle_mint = async () => {
         const tokens721 = assets.filter(x => x.type == AssetType.ERC721)
         const addresses721 = tokens721.map(x => x.address)
-        const signer2 = await getSigner()
-        const nftBags = new Contract('0x5FbDB2315678afecb367f032d93F642f64180aa3', nftBagsABI, signer)
+        const chainId = await signer?.getChainId()
+        if (!chainId) return
+        //const signer = await getSigner()
+        const nftBags = new Contract(getContractAddresses(chainId).nftBags, nftBagsABI, signer)
 
         try {
             console.log('minting', addresses721)
@@ -51,10 +55,10 @@ export function DashboardPage() {
             <h1>
                 Mint
             </h1>
-            <div>
+            <Container color="#2a4272">
                 <AssetFinder onAssetFound={handle_onAssetFound} />
                 <AssetList assets={assets} selectionChanged={handle_selectionChanged} />
-            </div>
+            </Container>
             <div>
                 <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Mint with {selectedAssets.length} assets</Button>
             </div>

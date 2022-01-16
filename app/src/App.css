@@ -36,3 +36,7 @@ section {
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+section > div.container {
+  min-width: 400px;
+}
