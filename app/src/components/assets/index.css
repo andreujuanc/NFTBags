@@ -1,0 +1,9 @@
+.asset-item{
+ display: flex;
+ flex-direction: row;
+ align-items: center;
+}
+
+.asset-item > *{
+    margin-right: 1rem;
+}

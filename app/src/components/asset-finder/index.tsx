@@ -1,22 +1,26 @@
 import { BaseProvider, getDefaultProvider, JsonRpcProvider } from "@ethersproject/providers";
 import { Contract } from "ethers";
 import { useState } from "react";
-import { erc20ABI, useProvider, erc721ABI, erc1155ABI, useConnect } from "wagmi";
+import { erc20ABI, erc721ABI, erc1155ABI, useConnect, } from "wagmi";
+import { erc165Abi } from "../../abis/ERC154";
 import { Asset, AssetType } from "../assets";
 import { Button } from "../button";
 import { Input } from "../input";
+
+const ERC1155InterfaceId: string = "0xd9b67a26"
+const ERC721InterfaceId: string = "0x80ac58cd"
 
 export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => void }) {
     const [asset, setAsset] = useState<Asset | undefined>(undefined)
     //const provider = useProvider()
     const [{ data, error, loading, }, connect] = useConnect()
-    
+
     const handle_onChange = async (value: string) => {
         const provider = new JsonRpcProvider('http://localhost:8545', {
             name: 'hardhat',
             chainId: await data.connector?.getChainId() ?? 0
         })
-        if(!value) {
+        if (!value) {
             setAsset(undefined)
             return
         }
@@ -32,19 +36,63 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
         if (asset)
             onAssetFound(asset)
     }
-    
+
     return (
         <div>
             <Input onChange={handle_onChange} />
-            <Button onClick={handle_addClicked} disabled={!asset}>
-                Add
-            </Button>
+
+            <div>
+                <div>
+                    <span>{asset && AssetType[asset.type]}</span>
+                    <span>{asset && asset.name}</span>
+                </div>
+                <Button onClick={handle_addClicked} disabled={!asset}>
+                    Add
+                </Button>
+            </div>
         </div>
     )
 }
 
+async function supportsInterface(address: string, provider: BaseProvider, interfaceId: string): Promise<boolean> {
+    try {
+        const erc165 = new Contract(address, erc165Abi, provider)
+        return await erc165.functions.supportsInterface(interfaceId)
+    } catch {
+        return false
+    }
+
+}
+
 async function tryGetContract(address: string, provider: BaseProvider): Promise<Asset | undefined> {
-    //console.log('tryGetContract', provider?.network?.chainId)
+    try {
+        if (!await supportsInterface(address, provider, ERC721InterfaceId)) throw new Error()
+        const erc721 = new Contract(address, erc721ABI.concat(erc20ABI as any), provider)
+        return {
+            address: address,
+            name: await erc721.functions.name(),
+            symbol: '',
+            type: AssetType.ERC721,
+            selected: true
+        }
+    }
+    catch (e) {
+        console.error(e)
+    }
+    try {
+
+        if (!await supportsInterface(address, provider, ERC1155InterfaceId)) throw new Error()
+        const erc1155 = new Contract(address, erc1155ABI, provider)
+        const metadataFile = erc1155.functions.uri()
+        return {
+            address: address,
+            name: 'TODO: 1155 name',
+            symbol: '',
+            type: AssetType.ERC1155,
+            selected: true
+        }
+    }
+    catch { }
     try {
         const erc20 = new Contract(address, erc20ABI, provider)
         return {
@@ -56,26 +104,5 @@ async function tryGetContract(address: string, provider: BaseProvider): Promise<
         }
     }
     catch { }
-    try {
-        const erc721 = new Contract(address, erc721ABI, provider)
-        return {
-            address: address,
-            name: await erc721.functions.name(),
-            symbol: '',
-            type: AssetType.ERC20,
-            selected: true
-        }
-    }
-    catch { }
-    try {
-        const erc1155 = new Contract(address, erc1155ABI, provider)
-        return {
-            address: address,
-            name: await erc1155.functions.name(),
-            symbol: '',
-            type: AssetType.ERC20,
-            selected: true
-        }
-    }
-    catch { }
+
 }
