@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useContract, useSigner } from "wagmi";
+import { erc721ABI, useContract, useSigner } from "wagmi";
 import { AssetFinder } from "../components/asset-finder";
 import { Asset, AssetList, AssetType } from "../components/assets";
 import { Button } from "../components/button";
@@ -7,13 +7,16 @@ import { nftBagsABI } from '../abis/NFTBags'
 import { Contract } from "ethers";
 import { getContractAddresses } from "../contracts";
 import { Container } from "../components/container";
+import { ERC721ABI } from "../abis/ERC721";
 
 export function DashboardPage() {
     const [assets, setAssets] = useState<(Asset)[]>([])
+    const [approvedAssets, setApprovedAssets] = useState<string[]>([])
     const [error, setError] = useState<string>()
     const [{ }, getSigner] = useSigner({
         skip: true
     })
+
 
     // const nftBags = useContract({
     //     addressOrName: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
@@ -34,8 +37,37 @@ export function DashboardPage() {
         // TODO: validate 1155
         setAssets([...assets, asset])
     }
+
     const handle_selectionChanged = () => {
         setAssets([...assets])// xD Sorry
+    }
+
+    const handle_approve = async () => {
+        //TODO: check with isApprovedForAll
+        try {
+            const nextToApprove = assets.find(x => {
+                return true
+            })
+
+            if (nextToApprove) {
+                const signer = await getSigner()
+                if (!signer) return
+                const chainId = await signer?.getChainId()
+                if (!chainId) return
+                const nftBagsContractAddress = getContractAddresses(chainId).nftBags
+
+                if (nextToApprove.type == AssetType.ERC721) {
+
+                    const contract721 = new Contract(nextToApprove.address, ERC721ABI, signer)
+                    await contract721.functions.setApprovalForAll(nftBagsContractAddress, true)
+                    
+                    setApprovedAssets([...approvedAssets, `${nextToApprove.address}-${nextToApprove.tokenId}`])
+                }
+            }
+
+        } catch (e: any) {
+            handleError(e);
+        }
     }
 
     const handle_mint = async () => {
@@ -44,7 +76,8 @@ export function DashboardPage() {
         const signer = await getSigner()
         const chainId = await signer?.getChainId()
         if (!chainId) return
-        const nftBags = new Contract(getContractAddresses(chainId).nftBags, nftBagsABI, signer)
+        const nftBagsContractAddress = getContractAddresses(chainId).nftBags
+        const nftBags = new Contract(nftBagsContractAddress, nftBagsABI, signer)
 
         try {
             console.log('minting', addresses721)
@@ -54,19 +87,7 @@ export function DashboardPage() {
             , )
             console.log('tx', tx)
         } catch (e: any) {
-            const errorPrefix = 'reverted with reason string'
-            const message = (e?.data?.message || e?.message) as (string | undefined)
-            if (message) {
-                const reverMessageIndex = message?.indexOf(errorPrefix)
-                if (reverMessageIndex && reverMessageIndex >= 0) {
-                    setError(message.substring(reverMessageIndex + errorPrefix.length))
-                }
-                else
-                    setError(message)
-            }
-            else {
-                setError(JSON.stringify(e))
-            }
+            handleError(e);
         }
     }
 
@@ -88,8 +109,26 @@ export function DashboardPage() {
                 </span>
             </Container>}
             <div>
-                <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0}>Mint with {selectedAssets.length} assets</Button>
+                <Button onClick={handle_approve}>Approve next</Button>
+                <Button onClick={handle_mint} disabled={!selectedAssets || selectedAssets.length == 0 || approvedAssets.length != selectedAssets.length}>Mint with {selectedAssets.length} assets</Button>
             </div>
         </section>
     )
+
+    function handleError(e: any) {
+        const errorPrefix = 'reverted with reason string';
+        const message = (e?.data?.message || e?.message) as (string | undefined);
+        if (message) {
+            const reverMessageIndex = message?.indexOf(errorPrefix);
+            if (reverMessageIndex && reverMessageIndex >= 0) {
+                setError(message.substring(reverMessageIndex + errorPrefix.length));
+            }
+
+            else
+                setError(message);
+        }
+        else {
+            setError(JSON.stringify(e));
+        }
+    }
 }

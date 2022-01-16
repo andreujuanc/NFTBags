@@ -15,8 +15,20 @@ async function main() {
   const MyToken = await ethers.getContractFactory("MyToken");
   const myToken = await MyToken.deploy()
 
+  const user = '0xeE7D6530942a2b80443D69211658F758B87c80c2'
+  await myToken.safeMint(user)
+  await myToken.safeMint(user)
+  await myToken.safeMint(user)
+  const tx2 = await deployer.sendTransaction({
+    to: user,
+    value: ethers.constants.WeiPerEther,
+  });
+  await tx2.wait();
+
+
   console.log('NFTBags', nftBags.address)
   console.log('MyToken', myToken.address)
+  
 }
 
 main().catch((error) => {
