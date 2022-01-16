@@ -43,15 +43,21 @@ export function DashboardPage() {
         setAssets([...assets, asset])
     }
 
-    const handle_selectionChanged = () => {
-        setAssets([...assets])// xD Sorry
+    const handle_selectionChanged = (asset: Asset) => {
+
+        if (assets.findIndex(x => x.id == asset.id) >= 0) {
+            setAssets([...assets])
+        }
+        else {
+            setAssets([...assets, asset])
+        }
     }
 
     const handle_approve = async () => {
         setError(undefined)
         //TODO: check with isApprovedForAll
         try {
-        
+
 
             if (nextToApprove) {
                 const signer = await getSigner()
@@ -78,7 +84,7 @@ export function DashboardPage() {
         setError(undefined)
         const tokens721 = assets.filter(x => x.type == AssetType.ERC721)
         const addresses721 = tokens721.map(x => x.address)
-        const ids721 =  tokens721.map(x => x.tokenId)
+        const ids721 = tokens721.map(x => x.tokenId)
 
         const signer = await getSigner()
         const chainId = await signer?.getChainId()

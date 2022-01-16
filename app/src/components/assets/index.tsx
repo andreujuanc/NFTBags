@@ -7,7 +7,7 @@ import './index.css'
 
 export function AssetList({ assets, selectionChanged }: {
     assets: Asset[],
-    selectionChanged: () => void
+    selectionChanged: (asset: Asset) => void
 }) {
     const [{ data: accountData }] = useAccount()
     const [moralisAssets, setMoralisAssets] = useState<Asset[]>([])
@@ -16,14 +16,15 @@ export function AssetList({ assets, selectionChanged }: {
         if (!accountData) return
         findUserAssetsWithMoralis(accountData.address)
             .then((result) => {
-                setMoralisAssets(result)
+
+                setMoralisAssets(result.filter(x => !assets.find(b => x.id == b.id)))
             })
     }, [accountData?.address])
 
     return (<div>
-        {assets.concat(moralisAssets).sort((a,b)=>a.id < b.id ? -1 : 1 ).map(x => (
+        {assets.concat(moralisAssets.filter(x=>!assets.find(b => x.id == b.id))).sort((a, b) => a.id < b.id ? -1 : 1).map(x => (
             <AssetItem key={`${x.address}-${x.tokenId}`} asset={x} selected={() => {
-                selectionChanged()
+                selectionChanged(x)
             }} />
         ))}
     </div>)
@@ -39,7 +40,7 @@ export function AssetItem({ asset, selected }: { asset: Asset, selected: (select
 
             <div>{AssetType[asset.type]}</div>
             <div>{asset.name}</div>
-            <div>{asset.tokenId && asset.tokenId.length > 10 ? asset.tokenId?.toString().substring(0, 4) + '...' + asset.tokenId?.toString().substring(asset.tokenId?.toString().length-4) : asset.tokenId}</div>
+            <div>{asset.tokenId && asset.tokenId.length > 10 ? asset.tokenId?.toString().substring(0, 4) + '...' + asset.tokenId?.toString().substring(asset.tokenId?.toString().length - 4) : asset.tokenId}</div>
             {/* <div>
                 {asset.id}
             </div> */}
