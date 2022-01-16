@@ -17,4 +17,8 @@ contract MyToken is ERC721, Ownable {
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "https://demo.com";
+    }
 }

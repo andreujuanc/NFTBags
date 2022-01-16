@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react"
+import { useAccount } from "wagmi"
+import { findUserAssetsWithMoralis, MoralisToken } from "../../lib/moralis"
 import { Checkbox } from "../checkbox"
 import './index.css'
 //import Moralis from 'moralis'
@@ -6,9 +9,19 @@ export function AssetList({ assets, selectionChanged }: {
     assets: Asset[],
     selectionChanged: () => void
 }) {
+    const [{ data: accountData }] = useAccount()
+    const [moralisAssets, setMoralisAssets] = useState<Asset[]>([])
+
+    useEffect(() => {
+        if (!accountData) return
+        findUserAssetsWithMoralis(accountData.address)
+            .then((result) => {
+                setMoralisAssets(result)
+            })
+    }, [accountData?.address])
 
     return (<div>
-        {assets.map(x => (
+        {assets.concat(moralisAssets).map(x => (
             <AssetItem key={`${x.address}-${x.tokenId}`} asset={x} selected={() => {
                 selectionChanged()
             }} />
@@ -26,10 +39,10 @@ export function AssetItem({ asset, selected }: { asset: Asset, selected: (select
 
             <div>{AssetType[asset.type]}</div>
             <div>{asset.name}</div>
-            <div>{asset.tokenId}</div>
-            <div>
+            <div>{asset.tokenId && asset.tokenId.length > 10 ? asset.tokenId?.toString().substring(0, 4) + '...' + asset.tokenId?.toString().substring(asset.tokenId?.toString().length-4) : asset.tokenId}</div>
+            {/* <div>
                 {asset.id}
-            </div>
+            </div> */}
         </div>
     )
 }
@@ -50,10 +63,3 @@ export enum AssetType {
     ERC721,
     ERC1155
 }
-
-// async function findUserAssetsWithMoralis(owner: string) {
-//     const polygonNFTs = await Moralis.Web3API.account.getNFTs({
-//         chain: 'mumbai',
-//         address: owner
-//     });
-// }

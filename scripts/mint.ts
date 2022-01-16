@@ -6,21 +6,16 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const [deployer, owner_1, owner_2] = await ethers.getSigners()
+  if(!process.env.ADDRESS) throw new Error('ADDRESS is not set')
+  if(!process.env.DEMO721)throw new Error('DEMO721 is not set')
 
-  const NFTBags = await ethers.getContractFactory("NFTBags")
-  const nftBags = await NFTBags.deploy()
-  await nftBags.deployed()
+  const MyToken = await ethers.getContractFactory("MyToken");
+  const myToken = await MyToken.attach(process.env.DEMO721)
 
-  // TOOD: if only hardhat/localhost
-  // const tx2 = await deployer.sendTransaction({
-  //   to: user,
-  //   value: ethers.constants.WeiPerEther,
-  // });
-  // await tx2.wait();
-
-
-  console.log('NFTBags', nftBags.address)
+  
+  const user = process.env.ADDRESS
+  await myToken.safeMint(user)
+  
 }
 
 main().catch((error) => {

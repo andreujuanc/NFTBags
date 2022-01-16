@@ -7,7 +7,7 @@ import { Asset, AssetType } from "../assets";
 import { Button } from "../button";
 import { Container } from "../container";
 import { Input } from "../input";
-//import Moralis from 'moralis'
+import Moralis from 'moralis'
 
 const ERC1155InterfaceId: string = "0xd9b67a26"
 const ERC721InterfaceId: string = "0x80ac58cd"
@@ -17,6 +17,7 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
     const provider = useProvider()
     const [{ data: accountData }] = useAccount()
     const [{ data, error, loading, }, connect] = useConnect()
+    const [found, setFound] = useState<Asset[]>([])
 
     const handle_onChange = async (value: string) => {
         if (!accountData) return
@@ -24,7 +25,7 @@ export function AssetFinder({ onAssetFound }: { onAssetFound: (asset: Asset) => 
             setAsset(undefined)
             return
         }
-        //const foundInMoralis = await findWithMoralis(accountData.address, value)
+        const foundInMoralis = await findWithMoralis(accountData.address, value)
         const found = await tryGetContract(value, provider)
         if (found) {
             setAsset(found)
@@ -88,7 +89,8 @@ async function supportsInterface(address: string, provider: BaseProvider, interf
     try {
         const erc165 = new Contract(address, erc165Abi, provider)
         return await erc165.functions.supportsInterface(interfaceId)
-    } catch {
+    } catch(ex) {
+        console.log('supportsInterface', ex)
         return false
     }
 
@@ -139,12 +141,7 @@ async function tryGetContract(address: string, provider: BaseProvider): Promise<
     catch { }
 
 }
-
-// async function findWithMoralis(owner: string, contract: string) {
-//     const polygonNFTs = await Moralis.Web3API.account.getNFTsForContract({
-//         token_address: contract,
-//         chain: 'mumbai',
-//         address: owner
-//     });
-// }
+function findWithMoralis(address: string, value: string) {
+    throw new Error("Function not implemented.");
+}
 
